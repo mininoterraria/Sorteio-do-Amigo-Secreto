@@ -41,38 +41,68 @@ function adicionar(){
         document.getElementById('nome-amigo').value = '';
         return;
     }
-
     //Adiciona no campo de exibição os nomes dos participantes.
     if(listaAmigos.length >= 1){
         exibirNomes.innerHTML += ` <span onclick="removerParticipante(${contadorId})" id= amigo-${contadorId++}>${nomeAmigo.value}</span>`;
-
         //Adiciona uma vírgula no nome anterior caso a lista incremente em 1 nome.
         let campoPrecedente = document.getElementById(`amigo-${contadorId - 2}`);
-        let nomePrecedente = campoPrecedente.textContent;
-        campoPrecedente.textContent =  nomePrecedente + ',';
+        campoPrecedente.textContent = campoPrecedente.textContent + ',';
     }else{
         exibirNomes.innerHTML += `<span onclick="removerParticipante(${contadorId})" id= amigo-${contadorId++}>${nomeAmigo.value}</span>`;
     }
 
     listaAmigos.push(nomeAmigo.value);
     document.getElementById('nome-amigo').value = ''; //Esvazia o campo input a cada adição.
+
+    
+
 }
 
 //Funcionalidade de evento onde o participante é removido da lista após clicar em seu nome na tela.
 function removerParticipante(id){
+    contadorId--; //Decrementa o contador de id`s.
+    let idAtual = id; //Variável utilizada para atualizar id`s e parâmetros de cada elemento html.
     let campoNomeParticipante = document.getElementById(`amigo-${id}`);
-    let nomeParticipante = campoNomeParticipante.textContent;
-
+    let nomeParticipanteAtual = campoNomeParticipante.textContent;
+    
     //Caso o nome do participante atual tenha vírgula, ela é removida para o nome ser removido do array.
-    if(nomeParticipante[nomeParticipante.length - 1] == ','){ 
-        nomeParticipante = nomeParticipante.replace(nomeParticipante[nomeParticipante.length - 1],'').trim();
+    if(nomeParticipanteAtual[nomeParticipanteAtual.length - 1] == ','){ 
+        nomeParticipanteAtual = nomeParticipanteAtual.replace(nomeParticipanteAtual[nomeParticipanteAtual.length - 1],'').trim();
     }
 
     //Remove do array o nome do participante.
-    listaAmigos.splice(listaAmigos.indexOf(nomeParticipante),1);
+    listaAmigos.splice(listaAmigos.indexOf(nomeParticipanteAtual),1);
 
     //Remove do campo de participantes o nome do participante atual.
-    campoNomeParticipante.textContent = '';
+    campoNomeParticipante.remove();
+
+    //Pega o elemento à esquerda do selecionado para remover.
+    let esquerdaDoIdAtual = document.getElementById(`amigo-${idAtual - 1}`);
+    //Pega o elemento à direita do selecionado para remover.
+    let direitaDoIdAtual = document.getElementById(`amigo-${idAtual + 1}`);
+
+    //Se não tiver um nome à direita do id atual mas sim à esquerda.
+    if(direitaDoIdAtual == null && esquerdaDoIdAtual != null){ 
+        let nomeEsquerdo = esquerdaDoIdAtual.textContent;
+        if(nomeEsquerdo[nomeEsquerdo.length - 1] == ','){
+            nomeEsquerdo = nomeEsquerdo.replace(nomeEsquerdo[nomeEsquerdo.length - 1],'');
+            esquerdaDoIdAtual.textContent = nomeEsquerdo;
+        }
+    }
+
+    //Atualiza o id e parametro dos elementos html que ficaram.
+    while(true){
+        id++
+        let campoNomeParticipanteConsequente = document.getElementById(`amigo-${id}`);
+
+        if(campoNomeParticipanteConsequente == null){
+            break;
+        }else{
+            campoNomeParticipanteConsequente.id = `amigo-${id - 1}`;
+            campoNomeParticipanteConsequente.setAttribute('onclick',`removerParticipante(${id - 1})`);
+        }
+    }
+    
 }
 
 //Função para fazer o sorteio.
@@ -110,6 +140,5 @@ function reiniciar(){
     document.getElementById('lista-amigos').textContent = '';
     document.getElementById('lista-sorteio').textContent = '';
 }
-
 
 
